@@ -15,8 +15,8 @@ decompressed bytes match the original bytes.
 - Binary file encoding and decoding.
 - Compression followed by decompression test.
 
-The current API is still low-level: file processing is controlled by the user
-through `Ppm`, `Codificador_aritmetico` and `ArquivoInfo`.
+The library provides a high-level file API through `ppm_io`, as well as the
+lower-level `Ppm`, `Codificador_aritmetico` and `ArquivoInfo` types.
 
 ## Requirements
 
@@ -37,9 +37,11 @@ through `Ppm`, `Codificador_aritmetico` and `ArquivoInfo`.
 │   ├── estrutura_contexto.cpp
 │   ├── estrutura_contexto.hpp
 │   ├── ppm.cpp
-│   └── ppm.hpp
+│   ├── ppm.hpp
+│   ├── ppm_io.cpp
+│   └── ppm_io.hpp
 └── tests/
-		└── roundtrip.cpp
+    └── roundtrip.cpp
 ```
 
 ## Building
@@ -78,8 +80,8 @@ with the input:
 
 ```bash
 ./build/ppm_roundtrip \
-	"/path/to/input" \
-	"/tmp/archive.ppm"
+  "/path/to/input" \
+  "/tmp/archive.ppm"
 ```
 
 Example using the Silesia `dickens` file:
@@ -134,6 +136,27 @@ cmake --build build
 
 ## Current API usage
 
+The recommended file-level API is provided by `ppm_io`:
+
+```cpp
+#include "ppm_io.hpp"
+
+int main() {
+	const int kmax = 5;
+	if (!ppm_io::compress_file("input.bin", "output.ppm", kmax)) {
+		return 1;
+	}
+	return ppm_io::decompress_file("output.ppm", "restored.bin", kmax) ? 0 : 1;
+}
+```
+
+The `kmax` value must be the same during compression and decompression because
+the current archive format does not store it. The high-level API currently
+compresses and decompresses one file per operation.
+
+For direct access to the model and arithmetic coder, the lower-level encoding
+flow is:
+
 The basic encoding flow is:
 
 ```cpp
@@ -181,6 +204,19 @@ arithmetic stream bytes, MSB first
 The current format uses the platform's native binary representation. As a
 result, files produced on platforms with different byte order may not be
 portable.
+
+The archive currently stores the original file name and size, but the high-level
+decompression function writes to the output path supplied by the caller.
+
+## Known limitations
+
+- The archive format supports one file per high-level compression operation.
+- The `kmax` value is not stored in the archive and must be supplied again
+	during decompression.
+- The format has fixed-size fields and does not yet provide versioning or a
+	checksum.
+- The current reader treats bits after EOF as zero padding; truncated archives
+	should be validated before being considered trusted.
 
 ## License
 
