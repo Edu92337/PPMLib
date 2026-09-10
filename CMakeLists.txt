@@ -82,3 +82,17 @@ export(EXPORT PPMLibTargets
     FILE ${CMAKE_CURRENT_BINARY_DIR}/PPMLibTargets.cmake
     NAMESPACE PPM::
 )
+
+add_library(ppm STATIC
+    src/ppm.cpp
+    src/estrutura_contexto.cpp
+    src/ppm_io.cpp
+)
+
+install(FILES
+    src/codificador_aritmetico.hpp
+    src/estrutura_contexto.hpp
+    src/ppm.hpp
+    src/ppm_io.hpp
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ppm
+)
