@@ -208,16 +208,6 @@ portable.
 The archive currently stores the original file name and size, but the high-level
 decompression function writes to the output path supplied by the caller.
 
-## Known limitations
-
-- The archive format supports one file per high-level compression operation.
-- The `kmax` value is not stored in the archive and must be supplied again
-	during decompression.
-- The format has fixed-size fields and does not yet provide versioning or a
-	checksum.
-- The current reader treats bits after EOF as zero padding; truncated archives
-	should be validated before being considered trusted.
-
 ## License
 
 No license has been defined for this repository yet.
