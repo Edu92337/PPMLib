@@ -38,12 +38,12 @@ bool compress_file(const std::string& input_path,
                    const Bytes& original) {
     Ppm encoder(5, true);
     for (uint8_t byte : original) {
-        encoder.processa_simbolo(byte);
+        encoder.process_symbol(byte);
     }
-    encoder.aritmetico.finaliza_codificacao();
+    encoder.aritmetico.finalize_encoding();
 
     ArquivoInfo info{input_path, static_cast<uintmax_t>(original.size())};
-    return encoder.aritmetico.salva_arquivo(
+    return encoder.aritmetico.save_archive(
         archive_path, {info}, original.size());
 }
 
@@ -72,10 +72,10 @@ bool decompress_file(const std::string& archive_path,
     }
 
     Ppm decoder(5, true);
-    decoder.aritmetico.prepara_decodificacao(archive);
+    decoder.aritmetico.prepare_decoding(archive);
     restored.reserve(static_cast<std::size_t>(original_size));
     for (uint64_t i = 0; i < original_size; ++i) {
-        restored.push_back(decoder.decodifica_simbolo(archive));
+        restored.push_back(decoder.decode_symbol(archive));
     }
     return true;
 }
@@ -99,30 +99,30 @@ int main(int argc, char** argv) {
         input_path = argv[1];
         archive_path = argv[2];
         if (!read_file(input_path, original)) {
-            std::cerr << "falha lendo a entrada: " << input_path << '\n';
+            std::cerr << "failed to read input: " << input_path << '\n';
             return 1;
         }
     } else {
-        std::cerr << "uso: ppm_roundtrip [entrada arquivo_comprimido]\n";
+        std::cerr << "usage: ppm_roundtrip [input compressed_archive]\n";
         return 2;
     }
 
     if (!compress_file(input_path, archive_path, original)) {
-        std::cerr << "falha comprimindo a entrada\n";
+        std::cerr << "failed to compress input\n";
         return 1;
     }
 
     Bytes restored;
     if (!decompress_file(archive_path, original, restored)) {
-        std::cerr << "falha descomprimindo o arquivo gerado\n";
+        std::cerr << "failed to decompress generated archive\n";
         return 1;
     }
     if (restored != original) {
-        std::cerr << "FALHA: a descompressao nao reproduziu a entrada\n";
+        std::cerr << "FAILURE: decompression did not reproduce the input\n";
         return 1;
     }
 
-    std::cout << "OK: compressao e descompressao reproduziram "
+    std::cout << "OK: compression and decompression reproduced "
               << original.size() << " bytes\n";
     return 0;
 }

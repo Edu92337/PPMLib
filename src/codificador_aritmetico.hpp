@@ -162,7 +162,7 @@ struct Codificador_aritmetico{
         try{
             ofstream arquivo(nome_arquivo, ios::binary);
             if(!arquivo.is_open()){
-                cerr << "[ERRO] Não foi possível abrir arquivo: " << nome_arquivo << endl;
+                cerr << "[ERROR] Could not open file: " << nome_arquivo << endl;
                 return false;
             }
 
@@ -197,13 +197,13 @@ struct Codificador_aritmetico{
             }
 
             arquivo.close();
-            cout << "[INFO] Arquivo comprimido salvo: " << nome_arquivo << endl;
-            cout << "[INFO] Total de bits: " << bits_buffer.size() << endl;
-            cout << "[INFO] Total de bytes: "
+            cout << "[INFO] Compressed file saved: " << nome_arquivo << endl;
+            cout << "[INFO] Total bits: " << bits_buffer.size() << endl;
+            cout << "[INFO] Total bytes: "
                  << (bits_buffer.size() / 8 + (bits_buffer.size() % 8 ? 1 : 0)) << endl;
             return true;
         }catch(exception& e){
-            cerr << "[ERRO] Exceção ao salvar arquivo: " << e.what() << endl;
+            cerr << "[ERROR] Exception while saving file: " << e.what() << endl;
             return false;
         }
     }

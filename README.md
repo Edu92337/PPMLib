@@ -93,7 +93,7 @@ Example using the Silesia `dickens` file:
 A successful run reports:
 
 ```text
-OK: compressao e descompressao reproduziram N bytes
+OK: compression and decompression reproduced N bytes
 ```
 
 ## Installation
