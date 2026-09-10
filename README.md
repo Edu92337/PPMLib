@@ -157,8 +157,6 @@ compresses and decompresses one file per operation.
 For direct access to the model and arithmetic coder, the lower-level encoding
 flow is:
 
-The basic encoding flow is:
-
 ```cpp
 #include "ppm.hpp"
 
@@ -205,10 +203,11 @@ The current format uses the platform's native binary representation. As a
 result, files produced on platforms with different byte order may not be
 portable.
 
-The archive currently stores the original file name and size, but the high-level
-decompression function writes to the output path supplied by the caller.
+The archive currently stores the original file name and size, but the
+high-level decompression function writes to the output path supplied by the
+caller rather than the stored name — and `Kmax` itself is not stored at all,
+so it must be tracked by the caller.
 
 ## License
 
 No license has been defined for this repository yet.
-# PPMLib
