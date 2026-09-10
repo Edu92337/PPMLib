@@ -148,15 +148,15 @@ std::ifstream input("input.bin", std::ios::binary);
 char byte = 0;
 uint64_t size = 0;
 while (input.get(byte)) {
-		compressor.processa_simbolo(
+		compressor.process_symbol(
 				static_cast<uint8_t>(static_cast<unsigned char>(byte)));
 		++size;
 }
 
-compressor.aritmetico.finaliza_codificacao();
+compressor.aritmetico.finalize_encoding();
 
 ArquivoInfo info{"input.bin", size};
-compressor.aritmetico.salva_arquivo(
+compressor.aritmetico.save_archive(
 		"output.ppm", {info}, size);
 ```
 
@@ -166,7 +166,7 @@ processing cost.
 
 ## Current file format
 
-The `salva_arquivo` method writes data in the following order:
+The `save_archive` method writes data in the following order:
 
 ```text
 uint64_t file_count

@@ -37,7 +37,7 @@ struct Codificador_aritmetico{
     int     bits_restantes_byte = 0;
 
     /** Returns the total frequency of symbols excluded from a context. */
-    uint32_t contagem_excluidos(No* contexto, const set<uint8_t>& excluidos)
+    uint32_t count_excluded(No* contexto, const set<uint8_t>& excluidos)
     {
         uint32_t t = 0;
         for(const auto& [s,f] : contexto->frequencias){
@@ -53,7 +53,7 @@ struct Codificador_aritmetico{
         No* contexto,
         const set<uint8_t>& excluidos)
     {
-        uint32_t total = contexto->total - contagem_excluidos(contexto, excluidos);
+        uint32_t total = contexto->total - count_excluded(contexto, excluidos);
 
         if(total == 0)
             return false;
@@ -86,18 +86,18 @@ struct Codificador_aritmetico{
         low  = (uint32_t)novo_low;
         high = (uint32_t)novo_high;
 
-        renormaliza();
+        renormalize();
         return true;
     }
 
     /** Renormalizes the encoder interval and emits stable leading bits. */
-    void renormaliza(){
+    void renormalize(){
         while(true){
             if(high < HALF){
-                escreve_bit_com_pendentes(0);
+                write_bit_with_pending(0);
             }
             else if(low >= HALF){
-                escreve_bit_com_pendentes(1);
+                write_bit_with_pending(1);
                 low  -= (uint32_t)HALF;
                 high -= (uint32_t)HALF;
             }
@@ -114,30 +114,30 @@ struct Codificador_aritmetico{
     }
 
     /** Appends one bit to the output buffer and updates the bit counter. */
-    void escreve_bit(bool bit){
+    void write_bit(bool bit){
         bits_buffer.push_back(bit);
         bits_emitidos_total++;
     }
 
     /** Emits one bit followed by all deferred complement bits. */
-    void escreve_bit_com_pendentes(bool bit){
-        escreve_bit(bit);
+    void write_bit_with_pending(bool bit){
+        write_bit(bit);
         for(uint32_t i = 0; i < bits_pendentes; i++)
-            escreve_bit(!bit);
+            write_bit(!bit);
         bits_pendentes = 0;
     }
 
     /** Finalizes the arithmetic interval after all input symbols are encoded. */
-    void finaliza_codificacao(){
+    void finalize_encoding(){
         bits_pendentes++;
         if(low < FIRST_QTR)
-            escreve_bit_com_pendentes(0);
+            write_bit_with_pending(0);
         else
-            escreve_bit_com_pendentes(1);
+            write_bit_with_pending(1);
     }
 
     /** Resets the arithmetic coder state for a new stream. */
-    void reinicia() {
+    void reset() {
         low = 0;
         high = (uint32_t)TOP;
 
@@ -155,7 +155,7 @@ struct Codificador_aritmetico{
     }
 
     /** Writes the encoded bit stream and file metadata to a binary archive. */
-    bool salva_arquivo(const string& nome_arquivo,
+    bool save_archive(const string& nome_arquivo,
                        const vector<ArquivoInfo>& arquivos_vet,
                        uint64_t tamanho_total_original)
     {
@@ -209,7 +209,7 @@ struct Codificador_aritmetico{
     }
 
     /** Clears the encoded bit buffer and restores the interval bounds. */
-    void limpa_buffer(){
+    void clear_buffer(){
         bits_buffer.clear();
         bits_pendentes = 0;
         low  = 0;
@@ -217,12 +217,12 @@ struct Codificador_aritmetico{
     }
 
     /** Returns the encoded payload size in bytes, including partial bytes. */
-    uint64_t tamanho_comprimido(){
+    uint64_t compressed_size(){
         return bits_buffer.size() / 8 + (bits_buffer.size() % 8 ? 1 : 0);
     }
 
     /** Reads one bit from the compressed stream. */
-    bool le_bit(ifstream& arquivo_bits){
+    bool read_bit(ifstream& arquivo_bits){
         if(bits_restantes_byte == 0){
             uint8_t b = 0;
             arquivo_bits.get((char&)b);
@@ -237,7 +237,7 @@ struct Codificador_aritmetico{
     }
 
     /** Initializes the decoder register with the first 32 stream bits. */
-    void prepara_decodificacao(ifstream& arquivo_bits){
+    void prepare_decoding(ifstream& arquivo_bits){
         byte_leitura        = 0;
         bits_restantes_byte = 0;
         low   = 0;
@@ -245,26 +245,26 @@ struct Codificador_aritmetico{
         value = 0;
         bits_consumidos_total = 0;
         for(int i = 0; i < 32; i++)
-            value = (value << 1) | (le_bit(arquivo_bits) ? 1 : 0);
+            value = (value << 1) | (read_bit(arquivo_bits) ? 1 : 0);
     }
 
     /** Renormalizes the decoder interval using bits from the input stream. */
-    void renormaliza_leitura(ifstream& arquivo_bits){
+    void renormalize_reading(ifstream& arquivo_bits){
         while(true){
             if(high < HALF){
                 low   =  low        << 1;
                 high  = (high       << 1) | 1;
-                value = (value      << 1) | (le_bit(arquivo_bits) ? 1 : 0);
+                value = (value      << 1) | (read_bit(arquivo_bits) ? 1 : 0);
             }
             else if(low >= HALF){
                 low   = (low   - (uint32_t)HALF) << 1;
                 high  = ((high - (uint32_t)HALF) << 1) | 1;
-                value = ((value - (uint32_t)HALF) << 1) | (le_bit(arquivo_bits) ? 1 : 0);
+                value = ((value - (uint32_t)HALF) << 1) | (read_bit(arquivo_bits) ? 1 : 0);
             }
             else if(low >= FIRST_QTR && high < THIRD_QTR){
                 low   = (low   - (uint32_t)FIRST_QTR) << 1;
                 high  = ((high - (uint32_t)FIRST_QTR) << 1) | 1;
-                value = ((value - (uint32_t)FIRST_QTR) << 1) | (le_bit(arquivo_bits) ? 1 : 0);
+                value = ((value - (uint32_t)FIRST_QTR) << 1) | (read_bit(arquivo_bits) ? 1 : 0);
             }
             else break;
         }
@@ -272,7 +272,7 @@ struct Codificador_aritmetico{
 
     /** Decodes one symbol from the compressed stream using a context. */
     uint32_t decode_byte(No* contexto, const set<uint8_t>& excluidos, ifstream& arquivo_bits){
-        uint32_t total = contexto->total - contagem_excluidos(contexto, excluidos);
+        uint32_t total = contexto->total - count_excluded(contexto, excluidos);
 
         if(total == 0) return ESCAPE;
 
@@ -306,7 +306,7 @@ struct Codificador_aritmetico{
         low = (uint32_t)next_low;
         high = (uint32_t)next_high;
 
-        renormaliza_leitura(arquivo_bits);
+        renormalize_reading(arquivo_bits);
 
         return simbolo_encontrado;
     }

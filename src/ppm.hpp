@@ -33,16 +33,16 @@ struct Ppm{
     Ppm(int k, bool treinando);
     ~Ppm();
 
-    void inicia_equiprovaveis();
-    void reinicia_modelo();
-    bool existe_contexto(No* contexto, uint8_t simbolo);
-    No* busca_maior_contexto(deque<uint8_t>& janela);
-    void atualiza_frequencia_contexto(No* contexto, uint8_t atual);
-    uint32_t calcula_escape(No* contexto);
-    void insere_em_excluidos(No* contexto);
-    void atualiza_janela(uint8_t atual);
-    bool atualiza_contexto(uint8_t atual);
-    void processa_simbolo(uint8_t atual);
-    uint8_t decodifica_simbolo(ifstream& arquivo_bits);
+    void initialize_equiprobable();
+    void reset_model();
+    bool context_contains(No* contexto, uint8_t simbolo);
+    No* find_largest_context(deque<uint8_t>& janela);
+    void update_context_frequency(No* contexto, uint8_t atual);
+    uint32_t calculate_escape(No* contexto);
+    void add_to_excluded(No* contexto);
+    void update_window(uint8_t atual);
+    bool update_context(uint8_t atual);
+    void process_symbol(uint8_t atual);
+    uint8_t decode_symbol(ifstream& arquivo_bits);
 
 };

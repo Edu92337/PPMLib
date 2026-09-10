@@ -21,7 +21,7 @@ uint32_t& No::freq_ref(uint16_t simbolo) {
 }
 
 /** Returns the child node associated with a byte, or nullptr if absent. */
-No* No::busca_filho(uint8_t b) const {
+No* No::find_child(uint8_t b) const {
 	for (const auto& [byte, no] : filhos) {
 		if (byte == b) return no;
 	}
@@ -33,25 +33,25 @@ trie_contexto::trie_contexto() : raiz(new No()) {}
 
 /** Releases every node owned by the context trie. */
 trie_contexto::~trie_contexto() {
-	libera(raiz);
+	release(raiz);
 }
 
 /** Recursively releases a node and all of its descendants. */
-void trie_contexto::libera(No* no) {
+void trie_contexto::release(No* no) {
 	if (!no) return;
 	for (auto& [_, filho] : no->filhos) {
-		libera(filho);
+		release(filho);
 	}
 	num_nos--;
 	delete no;
 }
 
 /** Inserts all suffix contexts represented by a byte sequence. */
-bool trie_contexto::insere_byte_em_contexto(const deque<uint8_t>& bytes) {
+bool trie_contexto::insert_byte_context(const deque<uint8_t>& bytes) {
 	No* atual = raiz;
 	for (auto it = bytes.rbegin(); it != bytes.rend(); ++it) {
 		uint8_t b = *it;
-		No* filho = atual->busca_filho(b);
+		No* filho = atual->find_child(b);
 		if (!filho) {
 			filho = new No();
 			filho->pai = atual;
@@ -64,10 +64,10 @@ bool trie_contexto::insere_byte_em_contexto(const deque<uint8_t>& bytes) {
 }
 
 /** Returns the deepest context matching the supplied byte sequence. */
-No* trie_contexto::busca_contexto_byte(const deque<uint8_t>& contexto) {
+No* trie_contexto::find_context(const deque<uint8_t>& contexto) {
 	No* atual = raiz;
 	for (auto it = contexto.rbegin(); it != contexto.rend(); ++it) {
-		No* filho = atual->busca_filho(*it);
+		No* filho = atual->find_child(*it);
 		if (filho) atual = filho;
 		else return atual;
 	}
@@ -75,7 +75,7 @@ No* trie_contexto::busca_contexto_byte(const deque<uint8_t>& contexto) {
 }
 
 /** Increments a symbol frequency in the context and all ancestor contexts. */
-void trie_contexto::atualiza_frequencia(No* contexto, uint8_t simbolo) {
+void trie_contexto::update_frequency(No* contexto, uint8_t simbolo) {
 	while (contexto != nullptr) {
 		uint32_t& f = contexto->freq_ref(simbolo);
 		if (f == 0) contexto->distintos++;

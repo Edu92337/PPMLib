@@ -19,7 +19,7 @@ struct No{
 
     uint32_t get_freq(uint16_t simbolo) const;
     uint32_t& freq_ref(uint16_t simbolo);
-    No* busca_filho(uint8_t b) const;
+    No* find_child(uint8_t b) const;
 };
 
 struct trie_contexto{
@@ -29,11 +29,11 @@ struct trie_contexto{
     trie_contexto();
     ~trie_contexto();
 
-    void libera(No* no);
+    void release(No* no);
 
-    bool insere_byte_em_contexto(const deque<uint8_t>& bytes);
-    No* busca_contexto_byte(const deque<uint8_t>& contexto);
-    void atualiza_frequencia(No* contexto, uint8_t simbolo);
+    bool insert_byte_context(const deque<uint8_t>& bytes);
+    No* find_context(const deque<uint8_t>& contexto);
+    void update_frequency(No* contexto, uint8_t simbolo);
 
 
 };
