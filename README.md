@@ -182,19 +182,6 @@ The current format uses the platform's native binary representation. As a
 result, files produced on platforms with different byte order may not be
 portable.
 
-## Known limitations
-
-- There is not yet a high-level public function such as `compress()` or
-	`decompress()`.
-- The API uses raw pointers internally and objects must not be copied without
-	care.
-- The current reader treats bits after EOF as zero padding; truncated files
-	should be validated before being considered trusted.
-- The format has fixed-size fields and does not yet provide versioning or a
-	checksum.
-- `ppm_roundtrip` decompresses into memory only to validate equality; it does
-	not write a second restored file to disk.
-
 ## License
 
 No license has been defined for this repository yet.
