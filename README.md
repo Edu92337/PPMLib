@@ -86,7 +86,7 @@ Example using the Silesia `dickens` file:
 
 ```bash
 ./build/ppm_roundtrip \
-	"/home/eduardo/Faculdade/Introducao a Teoria da Informacao/Projeto-1/Silesia/dickens" \
+	"/path/to/Silesia/dickens" \
 	/tmp/dickens-roundtrip.ppm
 ```
 
