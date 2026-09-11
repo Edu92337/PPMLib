@@ -110,7 +110,8 @@ The installation includes:
 
 - `install/lib/libppm.a`;
 - headers under `install/include/ppm`;
-- CMake configuration files under `install/lib/cmake/PPMLib`.
+- CMake configuration files under `install/lib/cmake/PPMLib`;
+- the license file under `install/share/PPMLib`.
 
 ## Using the library from another CMake project
 
@@ -210,4 +211,8 @@ so it must be tracked by the caller.
 
 ## License
 
-No license has been defined for this repository yet.
+This project is licensed under the MIT License.
+
+Copyright (c) 2026 Eduardo Augusto Almeida Lira de Souza.
+
+See [LICENSE](LICENSE) for the complete license text.
